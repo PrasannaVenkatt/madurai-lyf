@@ -25,6 +25,9 @@ interface ActivityCardProps {
   hostAvatar?: string;
 }
 
+import { useAuth } from "@/lib/auth";
+import { useActivities } from "@/lib/activities";
+
 const ActivityCard = ({
   title = "Beach Volleyball Tournament",
   description = "Join us for a fun afternoon of beach volleyball! All skill levels welcome. Bring your sunscreen and water.",
@@ -37,6 +40,25 @@ const ActivityCard = ({
   hostName = "Sarah Chen",
   hostAvatar = "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
 }: ActivityCardProps) => {
+  const { user } = useAuth();
+  const { joinActivity, leaveActivity, toggleLike } = useActivities();
+  const isParticipant = user && participantCount > 0;
+  const canJoin = participantCount < maxParticipants;
+
+  const handleJoinClick = () => {
+    if (!user) return;
+    if (isParticipant) {
+      leaveActivity(id, user.id);
+    } else if (canJoin) {
+      joinActivity(id, user.id);
+    }
+  };
+
+  const handleLikeClick = () => {
+    if (!user) return;
+    toggleLike(id, user.id);
+  };
+
   return (
     <Card className="w-full max-w-[600px] bg-white overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <div className="relative h-48 w-full">
@@ -94,10 +116,12 @@ const ActivityCard = ({
       </CardContent>
 
       <CardFooter className="flex justify-between items-center">
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon" onClick={handleLikeClick}>
           <Heart className="w-4 h-4" />
         </Button>
-        <Button>Join Activity</Button>
+        <Button onClick={handleJoinClick} disabled={!canJoin && !isParticipant}>
+          {isParticipant ? "Leave Activity" : "Join Activity"}
+        </Button>
       </CardFooter>
     </Card>
   );

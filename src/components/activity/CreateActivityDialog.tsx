@@ -1,5 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { useAuth } from "@/lib/auth";
+import { useActivities } from "@/lib/activities";
 import {
   Dialog,
   DialogContent,
@@ -34,7 +36,24 @@ const CreateActivityDialog = ({
   const { register, handleSubmit } = useForm();
 
   const onSubmit = (data: any) => {
-    console.log(data);
+    const { user } = useAuth();
+    const { addActivity } = useActivities();
+
+    if (!user) return;
+
+    addActivity({
+      id: crypto.randomUUID(),
+      ...data,
+      imageUrl: "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1",
+      participantCount: 0,
+      hostId: user.id,
+      hostName: user.name,
+      hostAvatar: user.avatar || "",
+      participants: [],
+      likes: [],
+    });
+
+    onOpenChange?.(false);
   };
 
   return (

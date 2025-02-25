@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Bell, Plus } from "lucide-react";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 interface NavbarProps {
   userAvatar?: string;
@@ -22,11 +23,16 @@ interface NavbarProps {
   notificationCount?: number;
 }
 
+import { useAuth } from "@/lib/auth";
+
 const Navbar = ({
   userAvatar = "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
   userName = "John Doe",
   notificationCount = 3,
 }: NavbarProps) => {
+  const { user, logout } = useAuth();
+  const actualUserAvatar = user?.avatar || userAvatar;
+  const actualUserName = user?.name || userName;
   return (
     <nav className="w-full h-16 px-4 border-b bg-background flex items-center justify-between fixed top-0 z-50">
       <div className="flex items-center gap-8">
@@ -64,6 +70,7 @@ const Navbar = ({
           />
         </div>
 
+        <ThemeToggle />
         <Button variant="outline" size="icon" className="relative">
           <Bell className="h-4 w-4" />
           {notificationCount > 0 && (
@@ -90,7 +97,7 @@ const Navbar = ({
           <DropdownMenuContent align="end">
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Log out</DropdownMenuItem>
+            <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
